@@ -17,3 +17,6 @@ Icon
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 .cpcache
+.idea
+.nrepl-port
+*.iml

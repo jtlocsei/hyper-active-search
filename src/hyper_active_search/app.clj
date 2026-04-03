@@ -133,7 +133,33 @@
          :get #'search-page}]])
 
 
+(defonce server*
+  (atom nil))
+
+
+(defn start!
+  []
+  (when-let [server @server*]
+    (h/stop! server))
+  (reset! server*
+          (h/start! (h/create-handler #'routes) {:port 4000})))
+
+
+(defn stop!
+  []
+  (when-let [server @server*]
+    (h/stop! server)
+    (reset! server* nil)))
+
+
 (defn -main
   [& _]
-  (h/start! (h/create-handler #'routes) {:port 4000})
+  (start!)
   @(promise))
+
+
+(comment
+  ;; REPL helpers
+  (start!)
+  (stop!)
+  :_)
