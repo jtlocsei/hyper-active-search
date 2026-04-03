@@ -21,35 +21,20 @@
    "Sister Mary Kenneth Keller"])
 
 
-(defn request-query-param
-  [request key]
-  (or (get-in request [:parameters :query key])
-      (get-in request [:parameters :query (name key)])
-      (get-in request [:hyper/route :query-params key])
-      (get-in request [:hyper/route :query-params (name key)])
-      (get-in request [:query-params key])
-      (get-in request [:query-params (name key)])))
-
-
-(defn normalized-search
-  [value]
-  (let [trimmed (some-> value str str/trim)]
-    (when (seq trimmed)
-      trimmed)))
-
-
 (defn response-delay-ms
   [query]
-  (if-let [text (normalized-search query)]
+  (let [text (str/trim (str query))]
+    (if (seq text)
     (+ 120 (mod (Math/abs (long (hash text))) 280))
-    0))
+      0)))
 
 
 (defn filter-names
   [query]
-  (if-let [needle (some-> query normalized-search str/lower-case)]
-    (filterv #(str/includes? (str/lower-case %) needle) names)
-    names))
+  (let [needle (str/lower-case (str/trim (str query)))]
+    (if (seq needle)
+      (filterv #(str/includes? (str/lower-case %) needle) names)
+      names)))
 
 
 (defn- query-params-with-search
@@ -60,10 +45,12 @@
 
 (defn set-search!
   [form-data]
-  (let [query (normalized-search (or (:q form-data)
-                                     (get form-data "q")
-                                     (:search form-data)
-                                     (get form-data "search")))
+  (let [raw-query (or (:q form-data)
+                      (get form-data "q")
+                      (:search form-data)
+                      (get form-data "search"))
+        trimmed-query (str/trim (str raw-query))
+        query (when (seq trimmed-query) trimmed-query)
         delay-ms (response-delay-ms query)]
     (when (pos? delay-ms)
       (Thread/sleep delay-ms))
@@ -117,8 +104,10 @@
 
 
 (defn search-page
-  [request]
-  (let [query (normalized-search (request-query-param request :q))
+  [_request]
+  (let [query* (h/path-cursor :q nil)
+        trimmed-query (str/trim (str @query*))
+        query (when (seq trimmed-query) trimmed-query)
         apply-action (h/action (set-search! $form-data))
         clear-action (clear-search-expression
                        (h/action (clear-search!)))]

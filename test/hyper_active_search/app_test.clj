@@ -20,14 +20,6 @@
             node))
         (hiccup-node-seq rendered)))
 
-
-(deftest normalized-search-trims-and-drops-blank-values
-  (is (= "Grace"
-         (app/normalized-search "  Grace  ")))
-  (is (nil? (app/normalized-search "   ")))
-  (is (nil? (app/normalized-search nil))))
-
-
 (deftest filter-names-is-case-insensitive
   (is (= ["Grace Hopper"]
          (app/filter-names "grace")))
