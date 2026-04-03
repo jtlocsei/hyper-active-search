@@ -1,0 +1,11 @@
+{:paths ["src"]
+ :deps
+ {org.clojure/clojure {:mvn/version "1.12.4"}
+  dynamic-alpha/hyper {:git/url "https://github.com/dynamic-alpha/hyper"
+                       :git/sha "cbd8e757a3c96eb1e080b38c108514bac8357da6"}}
+ :aliases
+ {:run
+  {:main-opts ["-m" "hyper-active-search.app"]}
+  :test
+  {:extra-paths ["test"]
+   :main-opts ["-m" "hyper-active-search.test-runner"]}}}
