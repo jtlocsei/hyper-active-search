@@ -2,7 +2,7 @@
  :deps
  {org.clojure/clojure {:mvn/version "1.12.4"}
   dynamic-alpha/hyper {:git/url "https://github.com/dynamic-alpha/hyper"
-                       :git/sha "cbd8e757a3c96eb1e080b38c108514bac8357da6"}}
+                       :git/sha "dc317a3498ccaeb551acb280c86f027f8ff0bb9e"}}
  :aliases
  {:run
   {:main-opts ["-m" "hyper-active-search.app"]}

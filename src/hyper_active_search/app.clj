@@ -25,7 +25,7 @@
   [query]
   (let [text (str/trim (str query))]
     (if (seq text)
-    (+ 120 (mod (Math/abs (long (hash text))) 280))
+      (+ 120 (mod (Math/abs (long (hash text))) 280))
       0)))
 
 
@@ -110,7 +110,7 @@
         query (when (seq trimmed-query) trimmed-query)
         apply-action (h/action (set-search! $form-data))
         clear-action (clear-search-expression
-                       (h/action (clear-search!)))]
+                      (h/action (clear-search!)))]
     (search-view {:query query
                   :apply-action apply-action
                   :clear-action clear-action})))
