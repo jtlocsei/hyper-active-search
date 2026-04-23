@@ -5,7 +5,4 @@
                        :git/sha "dc317a3498ccaeb551acb280c86f027f8ff0bb9e"}}
  :aliases
  {:run
-  {:main-opts ["-m" "hyper-active-search.app"]}
-  :test
-  {:extra-paths ["test"]
-   :main-opts ["-m" "hyper-active-search.test-runner"]}}}
+  {:main-opts ["-m" "hyper-active-search.app"]}}}

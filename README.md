@@ -20,12 +20,6 @@ clojure -M:run
 
 Then open <http://localhost:4000>.
 
-## Test
-
-```bash
-clojure -M:test
-```
-
 ## What To Try
 
 - Type in both demos and compare how the local-only and synced draft strategies behave while apply responses come back with random jitter.
