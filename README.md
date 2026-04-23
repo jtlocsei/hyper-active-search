@@ -30,6 +30,9 @@ Build the standalone jar:
 clojure -T:build uber
 ```
 
+The jar bundles the Brotli native libraries needed for local Apple Silicon runs
+and typical Linux x86_64 hosting.
+
 Run it:
 
 ```bash

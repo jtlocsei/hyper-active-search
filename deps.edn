@@ -1,6 +1,7 @@
 {:paths ["src"]
  :deps
  {org.clojure/clojure {:mvn/version "1.12.4"}
+  com.aayushatharva.brotli4j/native-linux-x86_64 {:mvn/version "1.20.0"}
   dynamic-alpha/hyper {:git/url "https://github.com/dynamic-alpha/hyper"
                        :git/sha "dc317a3498ccaeb551acb280c86f027f8ff0bb9e"}}
  :aliases
