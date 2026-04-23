@@ -56,7 +56,7 @@
            min-apply-delay-ms
            "-"
            max-apply-delay-ms
-           "ms for nonblank searches")]
+           "ms")]
      [:ul
       (into []
             (map (fn [name]
@@ -121,7 +121,7 @@
          min-apply-delay-ms
          "-"
          max-apply-delay-ms
-         "ms server delay for nonblank apply actions. Clear buttons are immediate.")]
+         "ms server delay for apply actions. Clear buttons are immediate.")]
    (local-search-demo)
    (synced-search-demo)])
 
