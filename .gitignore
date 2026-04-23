@@ -16,7 +16,12 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
-.cpcache
-.idea
+
+### Clojure / Build
+.cpcache/
+target/
 .nrepl-port
+
+### IDE
+.idea/
 *.iml

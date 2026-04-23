@@ -20,6 +20,20 @@ clojure -M:run
 
 Then open <http://localhost:4000>.
 
+## Uberjar
+
+Build the standalone jar:
+
+```bash
+clojure -T:build uber
+```
+
+Run it:
+
+```bash
+java -jar target/hyper-active-search-standalone.jar
+```
+
 ## What To Try
 
 - Type in both demos and compare how the local-only and synced draft strategies behave while apply responses come back with random jitter.

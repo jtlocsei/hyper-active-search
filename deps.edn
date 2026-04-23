@@ -5,4 +5,7 @@
                        :git/sha "dc317a3498ccaeb551acb280c86f027f8ff0bb9e"}}
  :aliases
  {:run
-  {:main-opts ["-m" "hyper-active-search.app"]}}}
+  {:main-opts ["-m" "hyper-active-search.app"]}
+  :build
+  {:deps {io.github.clojure/tools.build {:mvn/version "0.10.13"}}
+   :ns-default build}}}
