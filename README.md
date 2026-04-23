@@ -18,7 +18,9 @@ The page searches a small hardcoded list of names. It is intentionally plain and
 clojure -M:run
 ```
 
-Then open <http://localhost:4000>.
+The app listens on `PORT` when it is set, otherwise it defaults to `8080`.
+
+Then open <http://localhost:8080>.
 
 ## Uberjar
 
@@ -32,6 +34,12 @@ Run it:
 
 ```bash
 java -jar target/hyper-active-search-standalone.jar
+```
+
+If you need a specific port:
+
+```bash
+PORT=4000 java -jar target/hyper-active-search-standalone.jar
 ```
 
 ## What To Try

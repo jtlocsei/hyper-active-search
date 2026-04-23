@@ -23,6 +23,7 @@
 
 (def min-apply-delay-ms 1200)
 (def max-apply-delay-ms 3000)
+(def default-port 8080)
 
 
 (defn rand-delay-ms
@@ -136,12 +137,27 @@
   (atom nil))
 
 
+(defn listen-port
+  "Return the port the app should bind to.
+
+   Uses the `PORT` environment variable when present, otherwise defaults to
+   `8080` for hosting environments that expect that port."
+  []
+  (if-let [port-str (some-> (System/getenv "PORT") str/trim not-empty)]
+    (try
+      (Integer/parseInt port-str)
+      (catch NumberFormatException _
+        (throw (ex-info "PORT must be an integer."
+                        {:port port-str}))))
+    default-port))
+
+
 (defn start!
   []
   (when-let [server @server*]
     (h/stop! server))
   (reset! server*
-          (h/start! (h/create-handler #'routes) {:port 4000})))
+          (h/start! (h/create-handler #'routes) {:port (listen-port)})))
 
 
 (defn stop!
