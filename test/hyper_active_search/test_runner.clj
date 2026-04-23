@@ -7,5 +7,5 @@
 (defn -main
   [& _]
   (let [{:keys [fail error]} (test/run-tests 'hyper-active-search.app-test)]
-    (when (pos? (+ fail error))
-      (System/exit 1))))
+    (shutdown-agents)
+    (System/exit (if (pos? (+ fail error)) 1 0))))

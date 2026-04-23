@@ -21,15 +21,22 @@
    "Sister Mary Kenneth Keller"])
 
 
-(defn response-delay-ms
-  [query]
-  (let [text (str/trim (str query))]
-    (if (seq text)
-      (+ 120 (mod (Math/abs (long (hash text))) 280))
-      0)))
+(def min-apply-delay-ms 1200)
+(def max-apply-delay-ms 3000)
+
+
+(defn rand-delay-ms
+  []
+  (+ min-apply-delay-ms
+    (rand-int (inc (- max-apply-delay-ms min-apply-delay-ms)))))
+
+
+
+(def search-input-style "width: min(32rem, 100%);")
 
 
 (defn filter-names
+  "Filter the demo name list by a case-insensitive substring match."
   [query]
   (let [needle (str/lower-case (str/trim (str query)))]
     (if (seq needle)
@@ -37,65 +44,19 @@
       names)))
 
 
-(defn- query-params-with-search
-  [existing-query-params query]
-  (cond-> (dissoc existing-query-params :q "q")
-    query (assoc :q query)))
-
-
-(defn set-search!
-  [form-data]
-  (let [raw-query (or (:q form-data)
-                      (get form-data "q")
-                      (:search form-data)
-                      (get form-data "search"))
-        trimmed-query (str/trim (str raw-query))
-        query (when (seq trimmed-query) trimmed-query)
-        delay-ms (response-delay-ms query)]
-    (when (pos? delay-ms)
-      (Thread/sleep delay-ms))
-    (swap! (h/path-cursor [] {})
-           #(query-params-with-search % query))))
-
-
-(defn clear-search!
-  []
-  (swap! (h/path-cursor [] {})
-         #(query-params-with-search % nil)))
-
-
-(defn clear-search-expression
-  [server-action]
-  (str "document.getElementById('live-search-input') && "
-       "(document.getElementById('live-search-input').value = ''); "
-       server-action))
-
-
-(defn search-view
-  [{:keys [query apply-action clear-action]}]
-  (let [delay-ms (response-delay-ms query)
-        matches (filter-names query)]
-    [:main
-     [:h1 "Hyper Active Search"]
-     [:form {:data-on:submit__prevent apply-action}
-      [:input {:id "live-search-input"
-               :name "q"
-               :type "search"
-               :value (or query "")
-               :autocomplete "off"
-               :data-ignore-morph true
-               :data-on:input__debounce.180ms apply-action}]
-      (when query
-        [:button {:id "clear-search-button"
-                  :type "button"
-                  :data-on:click clear-action}
-         "Clear"])]
+(defn search-results-view
+  "Render the committed query summary and filtered result list."
+  [query]
+  (let [matches (filter-names query)]
+    [:div
      [:p
       (str "Committed query: "
            (pr-str (or query ""))
-           " | Simulated delay: "
-           delay-ms
-           "ms")]
+           " | Apply delay: random "
+           min-apply-delay-ms
+           "-"
+           max-apply-delay-ms
+           "ms for nonblank searches")]
      [:ul
       (into []
             (map (fn [name]
@@ -103,17 +64,66 @@
             matches)]]))
 
 
+(defn local-search-demo
+  "Render the local-draft variant where typing stays client-only and `$value`
+   is used to hand off the committed search term."
+  []
+  (let [search-draft* (h/local-signal :local-search-draft "")
+        search*       (h/path-cursor :local-q "")]
+    [:section
+     [:h2 "Local-only draft signal demo"]
+     [:input {:value                        (or @search* "")
+              :data-bind                    search-draft*
+              :data-ignore-morph            true
+              :data-on:input__debounce.30ms (h/action
+                                              (Thread/sleep (rand-delay-ms))
+                                              (reset! search* $value))
+              :style                        search-input-style}]
+     [:button {:id            "local-clear-search-button"
+               :type          "button"
+               :data-on:click (str @search-draft* "='';"
+                                (h/action (reset! search* nil)))}
+      "Clear"]
+     (search-results-view @search*)]))
+
+
+(defn synced-search-demo
+  "Render the synced-draft variant where the draft signal round-trips through
+   the server and is read inside the apply action."
+  []
+  (let [search-draft*       (h/signal :synced-search-draft "")
+        search*      (h/path-cursor :synced-q "")]
+    [:section
+     [:h2 "Synced draft signal demo"]
+     [:input {:value                        (or @search* "")
+              :data-bind                    search-draft*
+              :data-ignore-morph            true
+              :data-on:input__debounce.30ms (h/action
+                                              (Thread/sleep (rand-delay-ms))
+                                              (reset! search* @search-draft*))
+              :style                        search-input-style}]
+     [:button {:id            "synced-clear-search-button"
+               :type          "button"
+               :data-on:click (h/action
+                                (reset! search-draft* "")
+                                (reset! search* nil))}
+      "Clear"]
+     (search-results-view @search*)]))
+
+
 (defn search-page
+  "Render the comparison page with both live-search variants."
   [_request]
-  (let [query* (h/path-cursor :q nil)
-        trimmed-query (str/trim (str @query*))
-        query (when (seq trimmed-query) trimmed-query)
-        apply-action (h/action (set-search! $form-data))
-        clear-action (clear-search-expression
-                      (h/action (clear-search!)))]
-    (search-view {:query query
-                  :apply-action apply-action
-                  :clear-action clear-action})))
+  [:main
+   [:h1 "Hyper Active Search"]
+   [:p
+    (str "Both demos use data-on:input__debounce.30ms and a random "
+         min-apply-delay-ms
+         "-"
+         max-apply-delay-ms
+         "ms server delay for nonblank apply actions. Clear buttons are immediate.")]
+   (local-search-demo)
+   (synced-search-demo)])
 
 
 (def routes
